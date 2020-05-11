@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+	<link rel="icon" type="image/x-icon" href="logo-min.png">
+    <title>Multi-class classification problems for the k-NN in the case of missing values</title>
+  </head>
+  <body>
+ 
+<nav class="navbar navbar-expand-md bg-primary navbar-dark">
+  <a class="navbar-brand" href="#">Results</a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="collapsibleNavbar">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" href="https://github.com/furoDMGroup/Multi-class-classification-problems-for-the-k-NN-in-the-case-of-missing-values"><img src="GitHub-Mark-Light-32px.png"> Github Repository</a>
+      </li>
+	  <li class="nav-item">
+		
+        <a class="nav-link" href="https://ur.edu.pl"><img src="logo-min.png" width="30" height="30">
+		University of Rzeszów homepage</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+<div class="container">
+	<div class="row">
+		<div class="col-md-2 col-xs-0"></div>
+		<div class="col-md-8 col-xs-12" style="text-align: left;">
+			<p></p>
+			<h4>Multiclass classification problems for the k-NN in the case of missing values</h4>
+				This website shows results of the following paper:<i style="font-style: italic"> 
+				U. Bentkowska, J. G. Bazan, M. Mrukowicz, L. Zaręba, P. Molenda,
+				"Multi-class classification problems for the k-NN algorithm in the case of missing values", 
+				FUZZ-IEEE 2020 submitted.</i> In the paper 8 datasets from the well known <a href="https://archive.ics.uci.edu/ml/datasets.php" class="text-secondary">UCI repository</a> was
+				taken to evaluate quality of our algorithm, called MF. It is a multiclass extension of the binary
+				classifier, called F, proposed in the paper:<i> U. Bentkowska, 
+				J. G. Bazan,  W. Rząsa,  and  L.  Zaręba,  "Application of interval-valued aggregation to optimization 
+				problem of k-NN classifiers  for  missing  values  case",  Inform.  Sci.,  vol.  486,  pp. 434–449, 2019.</i><p></p>
+				The research was made in the Institute of Computer Science, College of Natural Sciences, University of Rzeszów.<p></p>
+				The aim of the experiments was to compare numerical modelling with interval-valued modelling. 
+				In order to achieve this result we implemented also the binary classifier, called M, which is based on the WEKA library
+				approach. The multi-class version of this algorithm is called MM. <br>
+				
+				The presented results show AUROC (Area under ROC) values calculated for both MF and MM classifiers.
+				The experiments were made using stratified k-fold cross-validation. The AUC is an average
+				value of a series of k-folds results. The standard deviation was also computed. In both algoritms
+				MF and MM a parameter k of the nearest neighbours is involved. Moreover, in Algorithm MF two parameters, 
+				i.e. r and aggregation are involved. The obtained results for the given multiclass algorithms proved 
+				the superiority of interval modelling over numerical modelling. 
+				<p></p>
+				<ul class="list-group list-group-horizontal-md" style="text-align: center;">
+				  <li class="list-group-item bg-primary"><a href="sorted_iris.pdf" class="text-white">Iris</a></li>
+				  <li class="list-group-item bg-primary"><a href="balance_scale_sorted.pdf" class="text-white">Balance Scale</a></li>
+				  <li class="list-group-item bg-primary"><a href="sorted_vertebral.pdf" class="text-white">Vertebral</a></li>
+				  <li class="list-group-item bg-primary"><a href="sorted_seeds.pdf" class="text-white">Seeds</a></li>
+				  <li class="list-group-item bg-primary"><a href="wifi_sorted.pdf" class="text-white">Wifi</a></li>
+				  <li class="list-group-item bg-primary"><a href="wall_following_sorted.pdf" class="text-white">Wall following</a></li>
+				  <li class="list-group-item bg-primary"><a href="sorted_breast_tissue.pdf" class="text-white">Breast Tissue</a></li>
+				  <li class="list-group-item bg-primary"><a href="leaf_sorted.pdf" class="text-white">Leaf</a></li>
+				</ul>
+				<br>
+				The source code in Python and steps to reproduce results can be found <a href="https://github.com/furoDMGroup/Multi-class-classification-problems-for-the-k-NN-in-the-case-of-missing-values" class="text-secondary"><img src="GitHub-Mark-32px.png" width="12px" height="12px"> here</a>.
+				<p></p>
+				<div class="card bg-primary" style="text-align: left;">
+					<div class="card-body text-white">
+						Contact<p></p>
+					Urszula Bentkowska<br>
+					<svg class="bi bi-envelope-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+					<path d="M.05 3.555L8 8.414l7.95-4.859A2 2 0 0014 2H2A2 2 0 00.05 3.555zM16 4.697l-5.875 3.59L16 11.743V4.697zm-.168 8.108L9.157 8.879 8 9.586l-1.157-.707-6.675 3.926A2 2 0 002 14h12a2 2 0 001.832-1.195zM0 11.743l5.875-3.456L0 4.697v7.046z"/>
+					</svg>
+						email: ududziak@ur.edu.pl<p></p>
+						Marcin Mrukowicz<br>
+						  <svg class="bi bi-envelope-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+					    <path d="M.05 3.555L8 8.414l7.95-4.859A2 2 0 0014 2H2A2 2 0 00.05 3.555zM16 4.697l-5.875 3.59L16 11.743V4.697zm-.168 8.108L9.157 8.879 8 9.586l-1.157-.707-6.675 3.926A2 2 0 002 14h12a2 2 0 001.832-1.195zM0 11.743l5.875-3.456L0 4.697v7.046z"/>
+					</svg>
+						email: mmrukowicz@ur.edu.pl 
+					</div>
+				</div> 
+				<p></p>
+		</div>
+		<div class="col-md-2 col-xs-0"></div>
+	</div>
+</div> 
+
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+  </body>
+</html>
