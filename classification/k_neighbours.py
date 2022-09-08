@@ -1,6 +1,5 @@
 import random
 
-from dataset.fuzzy_sets import IntervalValuedFuzzySet
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.metrics import euclidean_distances
 from sklearn.utils.multiclass import unique_labels
@@ -8,8 +7,8 @@ from sklearn.utils.validation import check_X_y, check_is_fitted, check_array
 from statistics import mean
 import pandas as pd
 import numpy as np
-
 from dataset.aggregations import A1Aggregation
+
 
 class KNNAlgorithmM(BaseEstimator, ClassifierMixin):
     def __init__(self, k_neighbours=(3, 5, 7), metric='euclidean', main_class=1, missing_representation=-1):
@@ -366,6 +365,9 @@ class KNNAlgorithmF(KNNAlgorithmM):
         return predicted_decision_proba
 
     def predict(self, X):
+        return self.predict_optimized(X)
+
+    def predict_not_optimized(self, X):
         records_with_missing_values_indexes = self.get_missing_values_indexes(X)
         distance = euclidean_distances(X, self.X_)
         sorted = np.argsort(distance, axis=1)
@@ -396,6 +398,9 @@ class KNNAlgorithmF(KNNAlgorithmM):
         return predicted_decision
 
     def predict_proba(self, X):
+        return self.predict_proba_optimized(X)
+
+    def predict_proba_not_optimized(self, X):
         predicted_decision_proba = np.ndarray(shape=(X.shape[0], 2))
         records_with_missing_values_indexes = self.get_missing_values_indexes(X)
         distance = euclidean_distances(X, self.X_)

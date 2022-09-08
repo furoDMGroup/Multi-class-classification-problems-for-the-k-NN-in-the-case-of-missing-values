@@ -89,7 +89,7 @@ def test_aggregation():
         for j in range(len((3, 5, 7))):
             fuzzy_sets[k] = np.array([given_p[i, j], given_p[i, j]])
             k += 1
-        uncertainty_interval = f.aggregation.aggregate(fuzzy_sets)
+        uncertainty_interval = f.aggregation.aggregate_numpy_arrays_representation(fuzzy_sets)
         uncertainty_intervals[i] = uncertainty_interval
         print(uncertainty_interval)
         final_p = uncertainty_interval.sum() / 2

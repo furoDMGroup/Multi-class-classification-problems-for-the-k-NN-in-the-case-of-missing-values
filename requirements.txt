@@ -5,3 +5,4 @@ numpy
 pytest
 xlrd
 requests >= 2.23.0
+openpyxl

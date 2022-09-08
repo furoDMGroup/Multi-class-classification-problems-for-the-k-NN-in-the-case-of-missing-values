@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 import numpy as np
 from scipy.stats.mstats import gmean
-from dataset.fuzzy_sets import IntervalValuedFuzzySet
 
 
 class Aggregation(ABC):
@@ -48,6 +47,7 @@ class Aggregation(ABC):
         if isinstance(agg, A10Aggregation):
             return 'A10'
 
+
 # aggregations names comes from paper
 class A1Aggregation(Aggregation):
     def __init__(self):
@@ -55,6 +55,22 @@ class A1Aggregation(Aggregation):
 
     def aggregate_numpy_arrays_representation(self, fuzzy_sets):
         return fuzzy_sets.sum(axis=0) / fuzzy_sets.shape[0]
+
+
+class GMeanNumericallyImproved(Aggregation):
+    def __init__(self, axis=0):
+        super().__init__()
+        self.axis = axis
+
+    def aggregate_numpy_arrays_representation(self, fuzzy_sets):
+        if len(fuzzy_sets.shape) > 1:
+            raise RuntimeWarning('The implementation of this aggregation only allows'
+                                 'one dimensional array')
+        if 0 in fuzzy_sets:
+            return 0.0
+        if 0.0 in fuzzy_sets:
+            return 0.0
+        return gmean(fuzzy_sets, axis=self.axis)
 
 
 class A2Aggregation(Aggregation):
@@ -88,8 +104,15 @@ class A3Aggregation(Aggregation):
 
 
 class A4Aggregation(Aggregation):
-    def __init__(self, p):
+    # parameter p should be integer >= 3
+    def __init__(self, p=3):
         super().__init__()
+        if p < 3:
+            if p == 2:
+                raise RuntimeWarning('Setting parameter p equal to 2 coincides to A3')
+            raise RuntimeWarning('Parameter p should be integer >= 3')
+        if p is float:
+            raise RuntimeWarning('Parameter p should be integer')
         self.p = p
 
     def aggregate_numpy_arrays_representation(self, fuzzy_sets):
@@ -110,9 +133,9 @@ class A5Aggregation(Aggregation):
 
     def aggregate_numpy_arrays_representation(self, fuzzy_sets):
         lower = np.square(fuzzy_sets[:, 0])
-        upper = np.power(fuzzy_sets[:, 1], 3)
+        upper = np.float_power(fuzzy_sets[:, 1], 3)
         n = fuzzy_sets.shape[0]
-        return np.array([np.sqrt(lower.sum(axis=0) / n), np.sqrt(upper.sum(axis=0) / n)])
+        return np.array([np.sqrt(lower.sum(axis=0) / n), np.float_power(upper.sum(axis=0) / n, (1 / 3))])
 
 
 class A6Aggregation(Aggregation):
@@ -120,10 +143,11 @@ class A6Aggregation(Aggregation):
         super().__init__()
 
     def aggregate_numpy_arrays_representation(self, fuzzy_sets):
-        lower = np.power(fuzzy_sets[:, 0], 3)
-        upper = np.power(fuzzy_sets[:, 1], 4)
+        lower = np.float_power(fuzzy_sets[:, 0], 3)
+        upper = np.float_power(fuzzy_sets[:, 1], 4)
         n = fuzzy_sets.shape[0]
-        return np.array([np.sqrt(lower.sum(axis=0) / n), np.sqrt(upper.sum(axis=0) / n)])
+        return np.array(
+            [np.float_power(lower.sum(axis=0) / n, (1 / 3)), np.float_power(upper.sum(axis=0) / n, (1 / 4))])
 
 
 class A7Aggregation(Aggregation):
@@ -137,7 +161,7 @@ class A7Aggregation(Aggregation):
 
     def aggregate_numpy_arrays_representation(self, fuzzy_sets):
         summed = fuzzy_sets.sum(axis=0)
-        t = np.array([self._f(summed[1], f[1], f[0], fuzzy_sets.shape[0]) for f in fuzzy_sets])
+        t = np.array([self._f(summed[0], f[1], f[0], fuzzy_sets.shape[0]) for f in fuzzy_sets])
         return np.array([np.min(t), summed[1] / fuzzy_sets.shape[0]])
 
 
@@ -147,12 +171,12 @@ class A8Aggregation(Aggregation):
 
     def aggregate_numpy_arrays_representation(self, fuzzy_sets):
         n = fuzzy_sets.shape[0]
-        lower = gmean(fuzzy_sets[:, 0], axis=0)
-        upper_up = np.square(fuzzy_sets[:, 1]).sum(axis=0)
+        lower = GMeanNumericallyImproved(axis=0).aggregate_numpy_arrays_representation(fuzzy_sets[:, 0])
         upper_down = fuzzy_sets[:, 1].sum(axis=0)
         # division by zero, here 0/0 = 0
-        if np.all(upper_down == np.zeros(shape=(n,))):
+        if upper_down == 0:
             return np.array([lower, 0])
+        upper_up = np.square(fuzzy_sets[:, 1]).sum(axis=0)
         return np.array([lower, upper_up / upper_down])
 
 
@@ -163,12 +187,12 @@ class A9Aggregation(Aggregation):
     def aggregate_numpy_arrays_representation(self, fuzzy_sets):
         lower = np.square(fuzzy_sets[:, 0])
         n = fuzzy_sets.shape[0]
-        upper_up = np.power(fuzzy_sets[:, 1], 3)
+        upper_down = np.power(fuzzy_sets[:, 1], 2).sum(axis=0)
         # division by zero, here 0/0 = 0
-        if np.all(upper_up == np.zeros(shape=(n,))):
+        if upper_down == 0:
             return np.array([np.sqrt(lower.sum(axis=0) / n), 0])
-        upper_down = np.power(fuzzy_sets[:, 1], 2)
-        return np.array([np.sqrt(lower.sum(axis=0) / n), np.sum(upper_up, axis=0) / np.sum(upper_down, axis=0)])
+        upper_up = np.power(fuzzy_sets[:, 1], 3).sum(axis=0)
+        return np.array([np.sqrt(lower.sum(axis=0) / n), upper_up / upper_down])
 
 
 class A10Aggregation(Aggregation):
@@ -184,4 +208,26 @@ class A10Aggregation(Aggregation):
 
 if __name__ == '__main__':
     a = A1Aggregation().aggregate_numpy_arrays_representation(np.array([[0.1, 0.7], [0.3, 0.6]]))
+    print(a)
+    a = A4Aggregation(p=4).aggregate_numpy_arrays_representation(np.array([[0.1, 0.7], [0.3, 0.6]]))
+    print(a)
+    a = A5Aggregation().aggregate_numpy_arrays_representation(np.array([[0.1, 0.7], [0.3, 0.6]]))
+    print(a)
+    a = A6Aggregation().aggregate_numpy_arrays_representation(np.array([[0.1, 0.7], [0.3, 0.6]]))
+    print(a)
+    a = A7Aggregation().aggregate_numpy_arrays_representation(np.array([[0.1, 0.7], [0.3, 0.6]]))
+    print(a)
+    a = A8Aggregation().aggregate_numpy_arrays_representation(np.array([[0.1, 0.7], [0.3, 0.6]]))
+    print(a)
+    a = A9Aggregation().aggregate_numpy_arrays_representation(np.array([[0.1, 0.7], [0.3, 0.6]]))
+    print(a)
+    a = A10Aggregation().aggregate_numpy_arrays_representation(np.array([[0.1, 0.7], [0.3, 0.6]]))
+    print(a)
+    a = GMeanNumericallyImproved().aggregate_numpy_arrays_representation(np.array([0.0, 0.1]))
+    print(a)
+    print('A8 with div by zero')
+    a = A8Aggregation().aggregate_numpy_arrays_representation(np.array([[0.0, 0.1], [0.3, 0.6]]))
+    print(a)
+    # Runtime warning
+    a = GMeanNumericallyImproved().aggregate_numpy_arrays_representation(np.array([[0.1, 0.7], [0.3, 0.6]]))
     print(a)
