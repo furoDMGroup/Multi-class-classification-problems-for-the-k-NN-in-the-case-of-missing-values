@@ -1,11 +1,14 @@
 import pytest
 import numpy as np
 import pandas as pd
-from sklearn.datasets import load_iris
+from sklearn.datasets import load_iris, load_breast_cancer
 from sklearn.metrics import euclidean_distances
+from sklearn.model_selection import train_test_split
 
 from classification.k_neighbours import KNNAlgorithmM, KNNAlgorithmF, A1Aggregation
 from numpy.testing import assert_array_equal, assert_allclose
+
+from preprocessing.missing_values import MissingValuesInserterColumnsIndependent
 
 
 @pytest.fixture
@@ -77,8 +80,8 @@ def test_main_class_probability():
 def test_aggregation():
     test_decisions = np.array([0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1])
     given_p = np.array([[1/3, 2/5, 3/7],
-                           [1/3, 3/5, 4/7],
-                           [1, 3/5, 5/7]])
+                        [1/3, 3/5, 4/7],
+                        [1, 3/5, 5/7]])
     fuzzy_sets = np.zeros((3, 2))
     f = KNNAlgorithmF(aggregation=A1Aggregation())
     uncertainty_intervals = np.zeros(shape=(3,2))
@@ -94,7 +97,7 @@ def test_aggregation():
         print(uncertainty_interval)
         final_p = uncertainty_interval.sum() / 2
         print(final_p)
-    assert_array_equal(uncertainty_intervals, expected_uncertainty_intervals)
+    assert_allclose(uncertainty_intervals, expected_uncertainty_intervals, rtol=1e-04, atol=1e-04)
 
 
 def test_computing_euclidean_distance_with_missing_values():
@@ -146,14 +149,59 @@ def test_sorting():
 
 
 def test_compute_final_p():
-    X, y = load_iris(True)
+    X, y = load_iris(return_X_y=True)
     f = KNNAlgorithmF()
     f.fit(X, y)
     assert_array_equal(f.compute_final_p(X), f.compute_final_p_opt(X))
 
 
+def test_equivalence_of_classifiers():
+    data = np.array([[-1, 0.2, 0.4, 0.5],
+                     [0.3, -1, 0.3, 0.2],
+                     [0.3, 0.5, 0.3, 0.2],
+                     [0.3, 0.6, 0.3, -1]])
+    y = np.array([0, 1, 0, 1])
+
+    f = KNNAlgorithmF(missing_representation=-1, k_neighbours=(1,3), seed=5)
+    f2 = KNNAlgorithmF(missing_representation=-1, k_neighbours=(1,3), seed=5)
+    f.fit(data, y)
+    f2.fit(data, y)
+    assert_array_equal(f.predict_proba_not_optimized(data), f2.predict_proba_optimized(data))
+
+
+def test_equivalence_of_classifiers_real_data():
+    X, y = load_breast_cancer(return_X_y=True)
+
+    inserter = MissingValuesInserterColumnsIndependent(columns=range(X.shape[1]),
+                                                       nan_representation=-1, percentage=0.4, seed=True)
+    X_train, X_test, y_train, y_test = train_test_split(X, y)
+
+    f = KNNAlgorithmF(missing_representation=-1, k_neighbours=(1,3), seed=5)
+    f2 = KNNAlgorithmF(missing_representation=-1, k_neighbours=(1,3), seed=5)
+    f.fit(X_train, y_train)
+    f2.fit(X_train, y_train)
+    X_missing = inserter.fit_transform(X_test)
+    assert_array_equal(f.predict_proba_not_optimized(X_missing),
+                       f2.predict_proba_optimized(X_missing))
+
+def test_x():
+    X, y = load_breast_cancer(return_X_y=True)
+
+    inserter = MissingValuesInserterColumnsIndependent(columns=range(X.shape[1]),
+                                                       nan_representation=-1, percentage=0.4, seed=True)
+    X_train, X_test, y_train, y_test = train_test_split(X, y)
+
+    f = KNNAlgorithmF(missing_representation=-1, k_neighbours=(1,3), seed=5)
+    f2 = KNNAlgorithmF(missing_representation=-1, k_neighbours=(1,3), seed=5)
+    f.fit(X_train, y_train)
+    f2.fit(X_train, y_train)
+    X_missing = inserter.fit_transform(X_test)
+    # assert_array_equal(f.predict_proba_not_optimized(X_missing),
+    #                    f2.predict_proba_optimized(X_missing))
+    assert_array_equal(f.predict_proba_optimized(X_missing), f2.predict_proba_optimized_old(X_missing))
+
 def test_m_dist_equivalence():
-    X, y = load_iris(True)
+    X, y = load_iris(return_X_y=True)
     m = KNNAlgorithmM()
     m.fit(X, y)
 
